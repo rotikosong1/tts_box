@@ -1,0 +1,9 @@
+# --- Multi-Language TTS Box Dependencies ---
+# High-quality neural text-to-speech engine
+edge-tts
+
+# Audio playback and mixer control
+pygame
+
+# Audio manipulation and merging
+pydub
