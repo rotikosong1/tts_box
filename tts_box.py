@@ -8,7 +8,7 @@ import os
 import time
 import warnings
 import glob
-import tempfile  # New import for Windows Temp directory
+import tempfile
 from pydub import AudioSegment
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -21,14 +21,12 @@ def cleanup_temp_files():
     try:
         if pygame.mixer.get_init():
             pygame.mixer.music.stop()
-            pygame.mixer.music.unload() #
+            pygame.mixer.music.unload()
     except:
         pass
     time.sleep(0.2)
     
-    # Get the system temp directory path
     temp_dir = tempfile.gettempdir()
-    # Search for our specific prefix patterns in the Temp folder
     for pattern in ["_preview_*.mp3", "_cache_*.mp3"]:
         full_pattern = os.path.join(temp_dir, pattern)
         for f in glob.glob(full_pattern):
@@ -36,56 +34,56 @@ def cleanup_temp_files():
             except: pass
 
 # =========================
-# Multi-language UI Configuration
+# Multi-language UI Configuration (Updated with Icons)
 # =========================
 LANG_CONFIG = {
     "Chinese": {
         "voice": "zh-CN-XiaoxiaoNeural",
         "lang_lbl": "选择语言:", 
         "title": "朗读盒子", "input": "贴上文字 (每行一段)", "pause": "暂停 (秒)",
-        "save": "保存 MP3", "view": "试听", "pst": "暂停/恢复", "stp": "停止", "ext": "退出", "done": "完成！", "cfm": "确定离开？"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "完成！", "cfm": "确定离开？"
     },
     "English (UK)": {
         "voice": "en-GB-SoniaNeural",
         "lang_lbl": "Select Language:",
         "title": "TTS Box (UK)", "input": "Paste Text (One per line)", "pause": "Pause (s)",
-        "save": "Save MP3", "view": "Preview", "pst": "Pause/Resume", "stp": "Stop", "ext": "Exit", "done": "Done!", "cfm": "Exit now?"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "Done!", "cfm": "Exit now?"
     },
     "Japanese": {
-        "voice": "ja-JP-NanamiNeural", #
+        "voice": "ja-JP-NanamiNeural", 
         "lang_lbl": "言語を選択:",
         "title": "読み上げボックス", "input": "テキストを貼り付け", "pause": "一時停止",
-        "save": "保存", "view": "試聴", "pst": "再生/一時停止", "stp": "停止", "ext": "終了", "done": "完了！", "cfm": "終了しますか？"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "完了！", "cfm": "終了しますか？"
     },
     "Malay": {
         "voice": "ms-MY-YasminNeural",
         "lang_lbl": "Pilih Bahasa:",
         "title": "Kotak TTS", "input": "Tampal Teks", "pause": "Jeda (s)",
-        "save": "Simpan MP3", "view": "Dengar", "pst": "Jeda/Sambung", "stp": "Berhenti", "ext": "Keluar", "done": "Siap!", "cfm": "Keluar sekarang?"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "Siap!", "cfm": "Keluar sekarang?"
     },
     "Korean": {
         "voice": "ko-KR-SunHiNeural",
         "lang_lbl": "언어 선택:",
         "title": "음성 변환기", "input": "텍스트 붙여넣기", "pause": "일시 정지",
-        "save": "MP3 저장", "view": "미리 듣기", "pst": "정지/재개", "stp": "중지", "ext": "종료", "done": "완료!", "cfm": "종료하시겠습니까?"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "완료!", "cfm": "종료하시겠습니까?"
     },
     "Thai": {
-        "voice": "th-TH-PremwadeeNeural", #
+        "voice": "th-TH-PremwadeeNeural", 
         "lang_lbl": "เลือกภาษา:",
         "title": "กล่องอ่านออกเสียง", "input": "วางข้อความ", "pause": "หยุดชั่วคราว",
-        "save": "บันทึก MP3", "view": "ฟังตัวอย่าง", "pst": "หยุด/เล่นต่อ", "stp": "หยุด", "ext": "ออก", "done": "สำเร็จ!", "cfm": "ยืนยันการออก?"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "สำเร็จ!", "cfm": "ยืนยันการออก?"
     },
     "Vietnamese": {
         "voice": "vi-VN-HoaiMyNeural",
         "lang_lbl": "Chọn ngôn ngữ:",
         "title": "Hộp Đọc Văn Bản", "input": "Dán văn bản", "pause": "Tạm dừng",
-        "save": "Lưu MP3", "view": "Nghe thử", "pst": "Dừng/Tiếp tục", "stp": "Dừng", "ext": "Thoát", "done": "Xong!", "cfm": "Bạn có muốn thoát?"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "Xong!", "cfm": "Bạn có muốn thoát?"
     },
     "Tamil": {
         "voice": "ta-IN-PallaviNeural",
         "lang_lbl": "மொழியைத் தேர்ந்தெடுக்கவும்:",
         "title": "உரை பெட்டி", "input": "உரையை ஒட்டவும்", "pause": "இடைநிறுத்தம்",
-        "save": "சேமி MP3", "view": "முன்னோட்டம்", "pst": "தொடரவும்", "stp": "நிறுத்து", "ext": "வெளியேறு", "done": "முடிந்தது!", "cfm": "வெளியேறவா?"
+        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "முடிந்தது!", "cfm": "வெளியேறவா?"
     }
 }
 
@@ -93,13 +91,13 @@ pygame.mixer.init()
 cleanup_temp_files()
 
 # =========================
-# Core Logic (Updated to use Temp Path)
+# Core Logic
 # =========================
 async def perform_audio_synthesis(text_lines, pause_duration, final_path, p_bar, s_text):
     fragments = []
     line_count = len(text_lines)
     selected_voice = LANG_CONFIG[ui_language_var.get()]["voice"]
-    temp_dir = tempfile.gettempdir() # Use Windows Temp Folder
+    temp_dir = tempfile.gettempdir()
     
     try:
         master_track = AudioSegment.empty()
@@ -112,7 +110,6 @@ async def perform_audio_synthesis(text_lines, pause_duration, final_path, p_bar,
             p_bar.set(((index + 1) / line_count) * 70)
             app_window.update_idletasks()
             
-            # Save file into Temp directory
             temp_file = os.path.join(temp_dir, f"_cache_{int(time.time()*1000)}_{index}.mp3")
             communicate = edge_tts.Communicate(stripped_text, selected_voice)
             await communicate.save(temp_file)
@@ -129,7 +126,7 @@ async def perform_audio_synthesis(text_lines, pause_duration, final_path, p_bar,
         s_text.set(LANG_CONFIG[ui_language_var.get()]["done"])
     except Exception as e:
         s_text.set("Error")
-        messagebox.showerror("Error", f"Failed: {str(e)}") #
+        messagebox.showerror("Error", f"Failed: {str(e)}")
     finally:
         for path in fragments:
             if os.path.exists(path):
@@ -150,7 +147,6 @@ def start_process_thread(mode="export"):
     else:
         def preview_task():
             cleanup_temp_files()
-            # Save preview into Temp directory
             preview_file = os.path.join(tempfile.gettempdir(), f"_preview_{int(time.time())}.mp3")
             asyncio.run(perform_audio_synthesis(valid_lines, pause_val, preview_file, progress_var, status_var))
             if os.path.exists(preview_file):
@@ -159,11 +155,15 @@ def start_process_thread(mode="export"):
         threading.Thread(target=preview_task, daemon=True).start()
 
 # =========================
-# UI Layout (Identical to previous, English code)
+# UI Layout
 # =========================
 app_window = tk.Tk()
 app_window.geometry("850x650")
 app_window.configure(bg="#f8f9fa")
+
+# Try to load your icon
+try: app_window.iconbitmap("app.ico")
+except: pass
 
 ui_language_var = tk.StringVar(value="Chinese")
 progress_var = tk.DoubleVar(value=0)
@@ -193,7 +193,8 @@ lbl_input_hint.pack(side="left", padx=10)
 action_frame = tk.Frame(app_window, bg="#f8f9fa")
 action_frame.pack(side="bottom", fill="x", padx=10, pady=15)
 for i in range(5): action_frame.columnconfigure(i, weight=1)
-BTN_STYLE = {"font": ("Arial", 9, "bold"), "relief": "flat", "pady": 12, "fg": "white"}
+# Increased font size for icons
+BTN_STYLE = {"font": ("Segoe UI Symbol", 16, "bold"), "relief": "flat", "pady": 12, "fg": "white"}
 
 btn_save = tk.Button(action_frame, bg="#28a745", **BTN_STYLE, command=lambda: start_process_thread("export"))
 btn_save.grid(row=0, column=0, padx=3, sticky="nsew")
