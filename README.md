@@ -20,6 +20,11 @@ Self-Cleaning Cache: All temporary audio fragments are managed within the Window
 - Requirements
 Active internet connection required for Neural TTS synthesis.
 Compatible with Windows 10/11.
+FFmpeg must be installed on your system.
+1. Get the FFmpeg essentials from [FFmpeg.org](https://ffmpeg.org/download.html).
+2. Unzip the folder to a permanent path (e.g., `C:\ffmpeg`).
+3. Edit your System Environment Variables and add the `bin` folder path to `Path`.
+4. Run `ffmpeg -version` in CMD to confirm.
 
 # tts_box - CN
 多國語言語音合成盒 (Portable 免安裝版)
@@ -43,6 +48,11 @@ Compatible with Windows 10/11.
 
 - 系統需求
 需在有網路連接的 Windows 10/11 環境下執行。
+您的系統必須安裝FFmpeg。
+1. 前往 [FFmpeg 官網](https://ffmpeg.org/download.html) 下載 Windows 版本。
+2. 將資料夾移動到固定路徑（例如 `C:\ffmpeg`）。
+3. 在系統的「環境變數」中，將 `bin` 資料夾的路徑加入到 `Path`。
+4. 在命令提示字元輸入 `ffmpeg -version`，看到版本資訊即代表成功。
 
 # tts_box - BM
 Kotak TTS Pelbagai Bahasa (Versi Portable)
@@ -66,3 +76,8 @@ Pembersihan Automatik: Semua fail audio sementara diuruskan di dalam folder Wind
 - Keperluan Sistem
 Memerlukan sambungan internet untuk sintesis suara Neural TTS yang berkualiti tinggi.
 Sesuai untuk Windows 10 dan Windows 11.
+FFmpeg mesti dipasang pada sistem anda.
+1. Layari [FFmpeg.org](https://ffmpeg.org/download.html) untuk memuat turun fail Windows.
+2. Nyahzip fail ke lokasi kekal (contohnya `C:\ffmpeg`).
+3. Edit "Environment Variables" sistem dan masukkan laluan folder `bin` ke dalam `Path`.
+4. Taip `ffmpeg -version` dalam Terminal/CMD untuk memastikan ia berfungsi.
