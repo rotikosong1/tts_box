@@ -9,15 +9,20 @@ import time
 import warnings
 import glob
 import tempfile
+import shutil  # Used to check for FFmpeg in the system path
 from pydub import AudioSegment
 
+# Suppress specific UserWarnings from pydub or other libraries
 warnings.filterwarnings("ignore", category=UserWarning)
 
 # =========================
 # Helper: Cleanup Temporary Files
 # =========================
 def cleanup_temp_files():
-    """Stops the mixer and deletes cached mp3 files from the system Temp folder."""
+    """
+    Stops the audio mixer and deletes cached mp3 files from the system Temp folder 
+    to prevent storage bloat and file access errors.
+    """
     try:
         if pygame.mixer.get_init():
             pygame.mixer.music.stop()
@@ -26,74 +31,84 @@ def cleanup_temp_files():
         pass
     time.sleep(0.2)
     
+    # Target the Windows system Temp directory
     temp_dir = tempfile.gettempdir()
     for pattern in ["_preview_*.mp3", "_cache_*.mp3"]:
         full_pattern = os.path.join(temp_dir, pattern)
         for f in glob.glob(full_pattern):
-            try: os.remove(f)
-            except: pass
+            try: 
+                os.remove(f)
+            except: 
+                pass
 
 # =========================
-# Multi-language UI Configuration (Updated with Icons)
+# Multi-language UI Configuration
 # =========================
+# This dictionary manages the voice selection and UI labels for all supported languages.
 LANG_CONFIG = {
     "Chinese": {
         "voice": "zh-CN-XiaoxiaoNeural",
         "lang_lbl": "选择语言:", 
         "title": "朗读盒子", "input": "贴上文字 (每行一段)", "pause": "暂停 (秒)",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "完成！", "cfm": "确定离开？"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "完成！", "cfm": "确定离开？"
     },
     "English (UK)": {
         "voice": "en-GB-SoniaNeural",
         "lang_lbl": "Select Language:",
         "title": "TTS Box (UK)", "input": "Paste Text (One per line)", "pause": "Pause (s)",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "Done!", "cfm": "Exit now?"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "Done!", "cfm": "Exit now?"
     },
     "Japanese": {
         "voice": "ja-JP-NanamiNeural", 
         "lang_lbl": "言語を選択:",
         "title": "読み上げボックス", "input": "テキストを貼り付け", "pause": "一時停止",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "完了！", "cfm": "終了しますか？"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "完了！", "cfm": "終了しますか？"
     },
     "Malay": {
         "voice": "ms-MY-YasminNeural",
         "lang_lbl": "Pilih Bahasa:",
         "title": "Kotak TTS", "input": "Tampal Teks", "pause": "Jeda (s)",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "Siap!", "cfm": "Keluar sekarang?"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "Siap!", "cfm": "Keluar sekarang?"
     },
     "Korean": {
         "voice": "ko-KR-SunHiNeural",
         "lang_lbl": "언어 선택:",
         "title": "음성 변환기", "input": "텍스트 붙여넣기", "pause": "일시 정지",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "완료!", "cfm": "종료하시겠습니까?"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "완료!", "cfm": "종료하시겠습니까?"
     },
     "Thai": {
         "voice": "th-TH-PremwadeeNeural", 
         "lang_lbl": "เลือกภาษา:",
         "title": "กล่องอ่านออกเสียง", "input": "วางข้อความ", "pause": "หยุดชั่วคราว",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "สำเร็จ!", "cfm": "ยืนยันการออก?"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "สำเร็จ!", "cfm": "ยืนยันการออก?"
     },
     "Vietnamese": {
         "voice": "vi-VN-HoaiMyNeural",
         "lang_lbl": "Chọn ngôn ngữ:",
         "title": "Hộp Đọc Văn Bản", "input": "Dán văn bản", "pause": "Tạm dừng",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "Xong!", "cfm": "Bạn có muốn thoát?"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "Xong!", "cfm": "Bạn có muốn thoát?"
     },
     "Tamil": {
         "voice": "ta-IN-PallaviNeural",
         "lang_lbl": "மொழியைத் தேர்ந்தெடுக்கவும்:",
         "title": "உரை பெட்டி", "input": "உரையை ஒட்டவும்", "pause": "இடைநிறுத்தம்",
-        "save": "💾", "view": "▶", "pst": "Ⅱ", "stp": "■", "ext": "Exit", "done": "முடிந்தது!", "cfm": "வெளியேறவா?"
+        "save": "💾", "view": "▶", "pst": "⏸", "stp": "■", "ext": "Exit", "done": "முடிந்தது!", "cfm": "வெளியேறவா?"
     }
 }
 
+# Initialize pygame mixer for audio playback
 pygame.mixer.init()
+# Perform initial cleanup of any leftover temp files from previous sessions
 cleanup_temp_files()
 
 # =========================
 # Core Logic
 # =========================
 async def perform_audio_synthesis(text_lines, pause_duration, final_path, p_bar, s_text):
+    """
+    Synthesizes text lines into individual audio fragments, inserts silence, 
+    and exports the final merged MP3 file.
+    """
     fragments = []
     line_count = len(text_lines)
     selected_voice = LANG_CONFIG[ui_language_var.get()]["voice"]
@@ -103,11 +118,13 @@ async def perform_audio_synthesis(text_lines, pause_duration, final_path, p_bar,
         master_track = AudioSegment.empty()
         silence_gap = AudioSegment.silent(duration=int(pause_duration * 1000))
         
+        # Step 1: Generate audio for each line
         for index, content in enumerate(text_lines):
             stripped_text = content.strip()
-            if not stripped_text: continue
+            if not stripped_text: 
+                continue
             s_text.set("Wait...")
-            p_bar.set(((index + 1) / line_count) * 70)
+            p_bar.set(((index + 1) / line_count) * 70) # Progress up to 70% during generation
             app_window.update_idletasks()
             
             temp_file = os.path.join(temp_dir, f"_cache_{int(time.time()*1000)}_{index}.mp3")
@@ -115,29 +132,46 @@ async def perform_audio_synthesis(text_lines, pause_duration, final_path, p_bar,
             await communicate.save(temp_file)
             fragments.append(temp_file)
             
+        # Step 2: Merge fragments with silence intervals
         for index, file_path in enumerate(fragments):
             master_track += AudioSegment.from_mp3(file_path)
             if index < len(fragments) - 1: 
                 master_track += silence_gap
-            p_bar.set(70 + ((index + 1) / len(fragments)) * 30)
+            p_bar.set(70 + ((index + 1) / len(fragments)) * 30) # Progress from 70% to 100% during merging
             app_window.update_idletasks()
             
+        # Step 3: Export final file
         master_track.export(final_path, format="mp3")
         s_text.set(LANG_CONFIG[ui_language_var.get()]["done"])
     except Exception as e:
         s_text.set("Error")
         messagebox.showerror("Error", f"Failed: {str(e)}")
     finally:
+        # Cleanup cached fragments immediately after processing
         for path in fragments:
             if os.path.exists(path):
                 try: os.remove(path)
                 except: pass
 
 def start_process_thread(mode="export"):
+    """
+    Validates environment and input, then starts the synthesis process 
+    in a separate thread to keep the UI responsive.
+    """
+    # Verify FFmpeg installation before proceeding
+    if shutil.which("ffmpeg") is None:
+        messagebox.showerror("FFmpeg Missing", "This tool requires FFmpeg to handle MP3 processing.\nPlease install FFmpeg and add it to your system PATH.")
+        return
+
     raw_input = main_text_box.get("1.0", tk.END).strip()
-    if not raw_input: return
-    try: pause_val = float(pause_entry.get())
-    except: pause_val = 1.0
+    if not raw_input: 
+        return
+        
+    try: 
+        pause_val = float(pause_entry.get())
+    except: 
+        pause_val = 1.0
+        
     valid_lines = [line for line in raw_input.splitlines() if line.strip()]
     
     if mode == "export":
@@ -145,6 +179,7 @@ def start_process_thread(mode="export"):
         if save_path: 
             threading.Thread(target=lambda: asyncio.run(perform_audio_synthesis(valid_lines, pause_val, save_path, progress_var, status_var)), daemon=True).start()
     else:
+        # Preview mode generates a temp file and plays it immediately
         def preview_task():
             cleanup_temp_files()
             preview_file = os.path.join(tempfile.gettempdir(), f"_preview_{int(time.time())}.mp3")
@@ -161,15 +196,18 @@ app_window = tk.Tk()
 app_window.geometry("850x650")
 app_window.configure(bg="#f8f9fa")
 
-# Try to load your icon
-try: app_window.iconbitmap("app.ico")
-except: pass
+# Set application icon
+try: 
+    app_window.iconbitmap("app.ico")
+except: 
+    pass
 
 ui_language_var = tk.StringVar(value="Chinese")
 progress_var = tk.DoubleVar(value=0)
 status_var = tk.StringVar(value="")
 
 def update_ui_language(*args):
+    """Updates all UI labels and titles when the language selection changes."""
     config = LANG_CONFIG[ui_language_var.get()]
     app_window.title(config["title"])
     lbl_language_select.config(text=config["lang_lbl"])
@@ -182,6 +220,7 @@ def update_ui_language(*args):
     btn_exit.config(text=config["ext"])
     status_var.set("Ready")
 
+# Header Section: Language Selection
 header_frame = tk.Frame(app_window, bg="#f8f9fa")
 header_frame.pack(fill="x", padx=10, pady=5)
 lbl_language_select = tk.Label(header_frame, bg="#f8f9fa", font=("Arial", 9))
@@ -190,33 +229,45 @@ tk.OptionMenu(header_frame, ui_language_var, *LANG_CONFIG.keys()).pack(side="lef
 lbl_input_hint = tk.Label(header_frame, bg="#f8f9fa", font=("Arial", 10, "bold"))
 lbl_input_hint.pack(side="left", padx=10)
 
+# Footer Section: Control Buttons
 action_frame = tk.Frame(app_window, bg="#f8f9fa")
 action_frame.pack(side="bottom", fill="x", padx=10, pady=15)
-for i in range(5): action_frame.columnconfigure(i, weight=1)
-# Increased font size for icons
-BTN_STYLE = {"font": ("Segoe UI Symbol", 16, "bold"), "relief": "flat", "pady": 12, "fg": "white"}
+for i in range(5): 
+    action_frame.columnconfigure(i, weight=1)
+
+# Style for the icon-based buttons
+BTN_STYLE = {"font": ("Segoe UI Symbol", 14, "bold"), "relief": "flat", "pady": 12, "fg": "white"}
 
 btn_save = tk.Button(action_frame, bg="#28a745", **BTN_STYLE, command=lambda: start_process_thread("export"))
 btn_save.grid(row=0, column=0, padx=3, sticky="nsew")
+
 btn_preview = tk.Button(action_frame, bg="#007bff", **BTN_STYLE, command=lambda: start_process_thread("preview"))
 btn_preview.grid(row=0, column=1, padx=3, sticky="nsew")
-btn_pause = tk.Button(action_frame, bg="#fd7e14", **BTN_STYLE, command=lambda: pygame.mixer.music.pause() if pygame.mixer.music.get_busy() else pygame.mixer.music.unpause())
+
+btn_pause = tk.Button(action_frame, bg="#fd7e14", **BTN_STYLE, 
+                      command=lambda: pygame.mixer.music.pause() if pygame.mixer.music.get_busy() else pygame.mixer.music.unpause())
 btn_pause.grid(row=0, column=2, padx=3, sticky="nsew")
+
 btn_stop = tk.Button(action_frame, bg="#dc3545", **BTN_STYLE, command=lambda: pygame.mixer.music.stop())
 btn_stop.grid(row=0, column=3, padx=3, sticky="nsew")
 
 def handle_exit():
+    """Confirms exit and cleans up temp files before closing."""
     if messagebox.askyesno("Exit", LANG_CONFIG[ui_language_var.get()]["cfm"]):
         cleanup_temp_files()
         app_window.destroy()
-btn_exit = tk.Button(action_frame, bg="#6c757d", **BTN_STYLE, command=handle_exit)
+
+btn_exit = tk.Button(action_frame, bg="#6c757d", font=("Arial", 10, "bold"), relief="flat", pady=12, fg="white", command=handle_exit)
 btn_exit.grid(row=0, column=4, padx=3, sticky="nsew")
 
+# Status Section: Progress Bar and Text Status
 status_frame = tk.Frame(app_window, bg="#f8f9fa")
 status_frame.pack(side="bottom", fill="x", padx=20)
-ttk.Progressbar(status_frame, variable=progress_var, maximum=100).pack(fill="x")
+progress_bar = ttk.Progressbar(status_frame, variable=progress_var, maximum=100)
+progress_bar.pack(fill="x")
 tk.Label(status_frame, textvariable=status_var, bg="#f8f9fa", font=("Arial", 9)).pack()
 
+# Configuration Section: Pause Entry
 config_frame = tk.Frame(app_window, bg="#f8f9fa")
 config_frame.pack(side="bottom", pady=5)
 lbl_pause_hint = tk.Label(config_frame, bg="#f8f9fa")
@@ -225,6 +276,7 @@ pause_entry = tk.Entry(config_frame, width=5, font=("Arial", 12), justify="cente
 pause_entry.insert(0, "1.0")
 pause_entry.pack(side="left", padx=5)
 
+# Main Content: Text Input Area
 text_frame = tk.Frame(app_window)
 text_frame.pack(fill="both", expand=True, padx=10, pady=5)
 main_text_box = tk.Text(text_frame, font=("Arial", 14), relief="flat")
@@ -233,7 +285,10 @@ scrollbar = tk.Scrollbar(text_frame, command=main_text_box.yview)
 scrollbar.pack(side="right", fill="y")
 main_text_box.config(yscrollcommand=scrollbar.set)
 
+# Window close protocol and language trace
 app_window.protocol("WM_DELETE_WINDOW", handle_exit)
 ui_language_var.trace_add("write", update_ui_language)
-update_ui_language()
-app_window.mainloop()
+update_ui_language() # Initialize UI text
+
+if __name__ == "__main__":
+    app_window.mainloop()
